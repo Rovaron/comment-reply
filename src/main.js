@@ -4,7 +4,6 @@ import Vue from 'vue'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.css'
 import firebase from 'firebase'
-import firebaseui from 'firebaseui'
 import VueFire from 'vuefire'
 require('./stylus/index.styl')
 
