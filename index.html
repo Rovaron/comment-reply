@@ -14,14 +14,72 @@
 </head>
 
 <body>
-  <div id="app">
-    <md-toolbar>
-      <h2 class="md-title" style="flex: 1">Comment Reply</h2>
-    </md-toolbar>
+  <div id="app" class="app-viewport"> 
     <md-layout md-gutter>
-      <md-layout md-hide-xsmall md-flex-small="15" md-flex-medium="20" md-flex-large="25"></md-layout>
-      <md-layout md-flex-xsmall="100" md-flex-small="70" md-flex-medium="60" md-flex-large="50" id="teste">
-        <md-button>Teste</md-button>
+      <md-layout md-hide-xsmall md-flex-small="15" md-flex-medium="20" md-flex-large="30"></md-layout>
+      <md-layout md-flex-xsmall="100" md-flex-small="70" md-flex-medium="60" md-flex-large="40">
+        <md-layout md-flex="100">
+          <md-card class="full-width">
+            <md-card-header>
+              <div class="md-title">Comment Reply</div>
+              <div class="md-subhead">Responda todos os comentários da sua campanha de uma só vez</div>
+            </md-card-header>
+
+            <md-card-content v-if="authData">
+
+              <md-input-container>
+                <label for="page">Escolha a página</label>
+                <md-select name="select-page" id="select-page" v-model="selectedPage" required>
+                  <md-option value="000001">Eagle Propaganda</md-option>
+                  <md-option value="000002">Bucal Life</md-option>
+                  <md-option value="000003">Romero Advocacia</md-option>
+                </md-select>
+              </md-input-container>
+
+              <md-layout md-flex>
+                <md-input-container style="width: 75%;">
+                  <label>URL do post</label>
+                  <md-input type="text" required></md-input>
+                </md-input-container>
+                <md-button class="md-primary find-id">Descobrir ID</md-button>
+              </md-layout>
+
+              <md-input-container>
+                <label>ID do Post</label>
+                <md-input type="text" required></md-input>
+              </md-input-container>
+
+              <md-input-container>
+                <label>Textos a responder (separados por virgula)</label>
+                <md-input type="text" required></md-input>
+              </md-input-container>
+
+              <md-input-container>
+                <label class="hint">Resposta</label>
+                <md-textarea></md-textarea>
+                <span class="md-hint">use [nome] para inserir o nome da pessoa na publicação.</span>
+              </md-input-container>
+
+              <br>
+              <md-checkbox name="sendmessage" v-model="sendInboxMessage">Enviar mensagem privada</md-checkbox>
+              <md-input-container>
+                <label class="hint">Mensagem privada</label>
+                <md-textarea></md-textarea>
+                <span class="md-hint">use [nome] para inserir o nome da pessoa na publicação.</span>
+              </md-input-container>
+              <br>
+              <md-layout md-flex style="justify-content: flex-end">
+                <br>
+                <md-button class="md-raised md-primary">Responder comentários!</md-button>
+              </md-layout>
+            </md-card-content>
+
+            <md-card-content v-else>
+              <md-layout md-flex>
+               <md-button class="md-raised md-primary" @click="login">FAZER LOGIN COM FACEBOOK</md-button>
+              </md-layout>
+            </md-card-content>
+          </md-card>
       </md-layout>
     </md-layout>
   </div>
