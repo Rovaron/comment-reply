@@ -30,9 +30,7 @@
               <md-input-container>
                 <label for="page">Escolha a página</label>
                 <md-select name="select-page" id="select-page" v-model="selectedPage" required>
-                  <md-option value="000001">Eagle Propaganda</md-option>
-                  <md-option value="000002">Bucal Life</md-option>
-                  <md-option value="000003">Romero Advocacia</md-option>
+                  <md-option v-for="page in pageList" :value="page.$index">{{page.name}}</md-option>
                 </md-select>
               </md-input-container>
 

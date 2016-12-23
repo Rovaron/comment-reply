@@ -5,10 +5,13 @@ import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.css'
 import firebase from 'firebase'
 import VueFire from 'vuefire'
+import axios from 'axios'
+import VueLocalStorage from 'vue-localstorage'
 require('./stylus/index.styl')
 
 Vue.use(VueMaterial)
 Vue.use(VueFire)
+Vue.use(VueLocalStorage)
 
 Vue.material.registerTheme({
   default: {
@@ -32,27 +35,44 @@ const config = {
   messagingSenderId: '919095980567'
 }
 const firebaseApp = firebase.initializeApp(config).database()
-console.log(firebaseApp)
+console.log('app', firebaseApp)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  data: {
+    selectedPage: 'Escolha',
+    user: {},
+    logado: false,
+    pageList: [],
+    sendInboxMessage: true
+  },
+  localStorage: {
+    token: ''
+  },
   beforeCreate () {
     firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
+        // const vm = this
         this.user = user
-        this.logado = true
-        console.log('USER: ', user)
+        let accessToken = this.$localStorage.get('token')
+        axios.get('https://graph.facebook.com/me', {
+          params: {
+            fields: 'accounts',
+            access_token: accessToken
+          }
+        }).then(
+          (response) => {
+            this.logado = true
+            this.pageList = response.data.accounts.data
+            console.log('pages', this.pageList)
+          },
+          (error) => {
+            console.log('erro pages', error)
+          })
       } else {
         this.login()
       }
     }.bind(this))
-  },
-  data: {
-    selectedPage: 'Escolha',
-    sendInboxMessage: false,
-    user: {},
-    token: {},
-    logado: false
   },
   methods: {
     login () {
@@ -61,22 +81,15 @@ new Vue({
       provider.addScope('publish_pages')
       provider.addScope('pages_messaging')
 
-      firebase.auth().signInWithPopup(provider).then(function (result) {
-        this.token = result.credential.accessToken
-        this.user = result.user
-        this.logado = true
-      }).catch(function (error) {
-        let errorCode = error.code
-        let errorMessage = error.message
-        let email = error.email
-        let credential = error.credential
-        let errorTemplateString = `ERROR:
-        code: ${errorCode}
-        message: ${errorMessage}
-        user mail: ${email}
-        credential: ${credential}`
-        console.log(errorTemplateString)
-      })
+      firebase.auth().signInWithPopup(provider).then(
+        (result) => {
+          let token = result.credential.accessToken
+          this.$localStorage.set('token', token)
+        },
+        (error) => {
+          console.log('error:', error)
+        }
+      )
     }
   }
 })
