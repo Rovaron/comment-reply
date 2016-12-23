@@ -40,7 +40,7 @@ console.log('app', firebaseApp)
 new Vue({
   el: '#app',
   data: {
-    selectedPage: 'Escolha',
+    selectedPage: '',
     user: {},
     logado: false,
     pageList: [],

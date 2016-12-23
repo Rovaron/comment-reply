@@ -28,12 +28,12 @@
             <md-card-content v-if="logado">
 
               <md-input-container>
-                <label for="page">Escolha a página</label>
-                <md-select name="select-page" id="select-page" v-model="selectedPage" required>
-                  <md-option v-for="page in pageList" :value="page.$index">{{page.name}}</md-option>
+                <label for="selectedPage">Escolha a página</label>
+                <md-select name="page" id="selectedPage" v-model="selectedPage">
+                  <md-option v-for="(page, key) in pageList" :value="key">{{page.name}}</md-option>
                 </md-select>
               </md-input-container>
-
+                pagina:{{selectedPage}}
               <md-layout md-flex>
                 <md-input-container style="width: 75%;">
                   <label>URL do post</label>
