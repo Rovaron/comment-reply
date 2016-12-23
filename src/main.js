@@ -31,21 +31,52 @@ const config = {
   storageBucket: 'eagle-comment-reply.appspot.com',
   messagingSenderId: '919095980567'
 }
-const firebaseApp = firebase.initializeApp(config)
-const db = firebaseApp.database()
-console.log(db)
-
+const firebaseApp = firebase.initializeApp(config).database()
+console.log(firebaseApp)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
+  beforeCreate () {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        this.user = user
+        this.logado = true
+        console.log('USER: ', user)
+      } else {
+        this.login()
+      }
+    }.bind(this))
+  },
   data: {
     selectedPage: 'Escolha',
     sendInboxMessage: false,
-    authData: ''
+    user: {},
+    token: {},
+    logado: false
   },
   methods: {
     login () {
-      window.alert('teste')
+      const provider = new firebase.auth.FacebookAuthProvider()
+      provider.addScope('manage_pages')
+      provider.addScope('publish_pages')
+      provider.addScope('pages_messaging')
+
+      firebase.auth().signInWithPopup(provider).then(function (result) {
+        this.token = result.credential.accessToken
+        this.user = result.user
+        this.logado = true
+      }).catch(function (error) {
+        let errorCode = error.code
+        let errorMessage = error.message
+        let email = error.email
+        let credential = error.credential
+        let errorTemplateString = `ERROR:
+        code: ${errorCode}
+        message: ${errorMessage}
+        user mail: ${email}
+        credential: ${credential}`
+        console.log(errorTemplateString)
+      })
     }
   }
 })
