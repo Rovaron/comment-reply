@@ -44,7 +44,9 @@ new Vue({
     user: {},
     logado: false,
     pageList: [],
-    sendInboxMessage: true
+    sendInboxMessage: true,
+    postUrl: '',
+    postId: ''
   },
   localStorage: {
     token: ''
@@ -90,6 +92,31 @@ new Vue({
           console.log('error:', error)
         }
       )
+    },
+
+    discoverPostId (url) {
+      const replaceStringList = [
+        'https',
+        'http',
+        '://',
+        'www.',
+        'facebook.com/'
+      ]
+
+      for (let i = 0; i < replaceStringList.length; i++) {
+        url = url.replace(replaceStringList[i], '')
+      }
+
+      let urlSplited = url.split('/')
+      let pageId = urlSplited[0]
+      let postId = urlSplited[3]
+      let selectedPageId = this.pageList[this.selectedPage].id
+
+      if (pageId !== selectedPageId) {
+        console.log('pages diferentes', pageId, selectedPageId)
+      } else {
+        this.postId = postId
+      }
     }
   }
 })

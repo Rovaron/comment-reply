@@ -37,14 +37,14 @@
               <md-layout md-flex>
                 <md-input-container style="width: 75%;">
                   <label>URL do post</label>
-                  <md-input type="text" required></md-input>
+                  <md-input type="text" v-model="postUrl"></md-input>
                 </md-input-container>
-                <md-button class="md-primary find-id">Descobrir ID</md-button>
+                <md-button class="md-primary find-id" @click="discoverPostId(postUrl)">Descobrir ID</md-button>
               </md-layout>
 
               <md-input-container>
                 <label>ID do Post</label>
-                <md-input type="text" required></md-input>
+                <md-input type="text" required v-model="postId"></md-input>
               </md-input-container>
 
               <md-input-container>
