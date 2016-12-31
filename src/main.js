@@ -46,7 +46,8 @@ new Vue({
     pageList: [],
     sendInboxMessage: true,
     postUrl: '',
-    postId: ''
+    postId: '',
+    commentList: []
   },
   localStorage: {
     token: ''
@@ -95,6 +96,7 @@ new Vue({
     },
 
     discoverPostId (url) {
+      // TODO: NEEDS IMPROVEMENTS FOR OTHER TYPE OF POSTS
       const replaceStringList = [
         'https',
         'http',
@@ -117,7 +119,23 @@ new Vue({
         console.log('pagedata', selectedPage)
       } else {
         this.postId = postId
+        this.getCommentList(postId)
       }
+    },
+
+    getCommentList (postId) {
+      let accessToken = this.$localStorage.get('token')
+      axios.get('https://graph.facebook.com/' + postId + '/comments', {
+        params: { access_token: accessToken }
+      }).then(
+        (response) => {
+          this.commentList = response.data.data
+          console.log('lista de comments', this.commentList)
+        },
+        (error) => {
+          console.log('error', error)
+        }
+      )
     }
   }
 })
