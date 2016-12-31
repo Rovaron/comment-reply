@@ -15,7 +15,7 @@
 
 <body>
   <div id="app" class="app-viewport"> 
-    <md-layout md-gutter>
+    <md-layout md-gutter class="outerspace" id="app" class="app-viewport">
       <md-layout md-hide-xsmall md-flex-small="15" md-flex-medium="20" md-flex-large="30"></md-layout>
       <md-layout md-flex-xsmall="100" md-flex-small="70" md-flex-medium="60" md-flex-large="40">
         <md-layout md-flex="100">
@@ -33,7 +33,7 @@
                   <md-option v-for="(page, key) in pageList" :value="key">{{page.name}}</md-option>
                 </md-select>
               </md-input-container>
-                pagina:{{selectedPage}}
+
               <md-layout md-flex>
                 <md-input-container style="width: 75%;">
                   <label>URL do post</label>

@@ -57,15 +57,15 @@ new Vue({
         // const vm = this
         this.user = user
         let accessToken = this.$localStorage.get('token')
-        axios.get('https://graph.facebook.com/me', {
+        axios.get('https://graph.facebook.com/me/accounts', {
           params: {
-            fields: 'accounts',
+            fields: 'username,name',
             access_token: accessToken
           }
         }).then(
           (response) => {
             this.logado = true
-            this.pageList = response.data.accounts.data
+            this.pageList = response.data.data
             console.log('pages', this.pageList)
           },
           (error) => {
@@ -110,10 +110,11 @@ new Vue({
       let urlSplited = url.split('/')
       let pageId = urlSplited[0]
       let postId = urlSplited[3]
-      let selectedPageId = this.pageList[this.selectedPage].id
+      let selectedPage = this.pageList[this.selectedPage]
 
-      if (pageId !== selectedPageId) {
-        console.log('pages diferentes', pageId, selectedPageId)
+      if (pageId !== selectedPage.id && pageId !== selectedPage.username) {
+        console.log('pages diferentes', pageId, selectedPage.id)
+        console.log('pagedata', selectedPage)
       } else {
         this.postId = postId
       }
