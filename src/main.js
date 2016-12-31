@@ -55,10 +55,9 @@ new Vue({
   beforeCreate () {
     firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
-        // const vm = this
         this.user = user
         let accessToken = this.$localStorage.get('token')
-        axios.get('https://graph.facebook.com/me/accounts', {
+        axios.get('https://graph.facebook.com/v2.2/me/accounts', {
           params: {
             fields: 'username,name',
             access_token: accessToken
@@ -96,7 +95,8 @@ new Vue({
     },
 
     discoverPostId (url) {
-      // TODO: NEEDS IMPROVEMENTS FOR OTHER TYPE OF POSTS
+      // TODO: NEEDS IMPROVEMENTS TO WORK WITH LINKS
+
       const replaceStringList = [
         'https',
         'http',
@@ -105,14 +105,22 @@ new Vue({
         'facebook.com/'
       ]
 
+      let isNumeric = (num) => (!isNaN(num) && num !== '')
+
       for (let i = 0; i < replaceStringList.length; i++) {
         url = url.replace(replaceStringList[i], '')
       }
 
       let urlSplited = url.split('/')
+      console.log('splited', urlSplited)
+      let _len = urlSplited.length
       let pageId = urlSplited[0]
-      let postId = urlSplited[3]
+      let postId = isNumeric(urlSplited[_len - 1]) ? urlSplited[_len - 1] : urlSplited[_len - 2]
       let selectedPage = this.pageList[this.selectedPage]
+
+      if (urlSplited[1] === 'posts' && !urlSplited[_len - 1].includes('_')) {
+        postId = selectedPage.id + '_' + postId
+      }
 
       if (pageId !== selectedPage.id && pageId !== selectedPage.username) {
         console.log('pages diferentes', pageId, selectedPage.id)
@@ -125,7 +133,7 @@ new Vue({
 
     getCommentList (postId) {
       let accessToken = this.$localStorage.get('token')
-      axios.get('https://graph.facebook.com/' + postId + '/comments', {
+      axios.get('https://graph.facebook.com/v2.2/' + postId + '/comments', {
         params: { access_token: accessToken }
       }).then(
         (response) => {
