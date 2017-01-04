@@ -50,9 +50,15 @@ new Vue({
     postId: '',
     commentList: []
   },
+
+  firebase: {
+
+  },
+
   localStorage: {
     token: ''
   },
+
   computed: {
     commentListWithKeyword () {
       let containKeyword = (comment) => this.keywordRegex.test(comment.message)
@@ -63,6 +69,7 @@ new Vue({
       return new RegExp(keywordsNormalized)
     }
   },
+
   beforeCreate () {
     firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
@@ -87,6 +94,7 @@ new Vue({
       }
     }.bind(this))
   },
+
   methods: {
     login () {
       const provider = new firebase.auth.FacebookAuthProvider()
@@ -107,7 +115,6 @@ new Vue({
 
     discoverPostId (url) {
       // TODO: NEEDS IMPROVEMENTS TO WORK WITH LINKS
-
       const replaceStringList = [
         'https',
         'http',
@@ -117,7 +124,6 @@ new Vue({
       ]
 
       let isNumeric = (num) => (!isNaN(num) && num !== '')
-
       for (let i = 0; i < replaceStringList.length; i++) {
         url = url.replace(replaceStringList[i], '')
       }
@@ -160,6 +166,7 @@ new Vue({
     debugging () {
       console.log('comentarios com palavra chave', this.commentListWithKeyword)
       console.log('keywordList', this.keywordRegex)
+      console.log('uid', this.user.uid)
     }
   }
 })
