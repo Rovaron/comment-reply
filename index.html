@@ -49,7 +49,7 @@
 
               <md-input-container>
                 <label>Textos a responder (separados por virgula)</label>
-                <md-input type="text" required></md-input>
+                <md-input type="text" required v-model="keywordsSeparatedByComma"></md-input>
               </md-input-container>
 
               <md-input-container>
@@ -68,7 +68,7 @@
               <br>
               <md-layout md-flex style="justify-content: flex-end">
                 <br>
-                <md-button class="md-raised md-primary">Responder comentários!</md-button>
+                <md-button class="md-raised md-primary" @click="debugging">Responder comentários!</md-button>
               </md-layout>
             </md-card-content>
 

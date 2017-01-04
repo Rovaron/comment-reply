@@ -41,6 +41,7 @@ new Vue({
   el: '#app',
   data: {
     selectedPage: '',
+    keywordsSeparatedByComma: '',
     user: {},
     logado: false,
     pageList: [],
@@ -52,12 +53,22 @@ new Vue({
   localStorage: {
     token: ''
   },
+  computed: {
+    commentListWithKeyword () {
+      let containKeyword = (comment) => this.keywordRegex.test(comment.message)
+      return this.commentList.filter(containKeyword)
+    },
+    keywordRegex () {
+      let keywordsNormalized = this.keywordsSeparatedByComma.replace(/\s/g, '').toLowerCase().replace(/,/g, '|')
+      return new RegExp(keywordsNormalized)
+    }
+  },
   beforeCreate () {
     firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         this.user = user
         let accessToken = this.$localStorage.get('token')
-        axios.get('https://graph.facebook.com/v2.2/me/accounts', {
+        axios.get('https://graph.facebook.com/me/accounts', {
           params: {
             fields: 'username,name',
             access_token: accessToken
@@ -133,7 +144,7 @@ new Vue({
 
     getCommentList (postId) {
       let accessToken = this.$localStorage.get('token')
-      axios.get('https://graph.facebook.com/v2.2/' + postId + '/comments', {
+      axios.get('https://graph.facebook.com/' + postId + '/comments', {
         params: { access_token: accessToken }
       }).then(
         (response) => {
@@ -144,6 +155,11 @@ new Vue({
           console.log('error', error)
         }
       )
+    },
+
+    debugging () {
+      console.log('comentarios com palavra chave', this.commentListWithKeyword)
+      console.log('keywordList', this.keywordRegex)
     }
   }
 })
