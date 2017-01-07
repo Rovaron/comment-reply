@@ -54,8 +54,8 @@
 
               <md-input-container>
                 <label class="hint">Resposta</label>
-                <md-textarea></md-textarea>
-                <span class="md-hint">use [nome] para inserir o nome da pessoa na publicação.</span>
+                <md-textarea v-model="commentReplyText"></md-textarea>
+                <span class="md-hint">use {nome} para inserir o nome da pessoa na publicação.</span>
               </md-input-container>
 
               <br>
@@ -63,7 +63,7 @@
               <md-input-container>
                 <label class="hint">Mensagem privada</label>
                 <md-textarea></md-textarea>
-                <span class="md-hint">use [nome] para inserir o nome da pessoa na publicação.</span>
+                <span class="md-hint">use {nome} para inserir o nome da pessoa na mensagem.</span>
               </md-input-container>
               <br>
               <md-layout md-flex style="justify-content: flex-end">
