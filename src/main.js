@@ -34,14 +34,14 @@ const config = {
   storageBucket: 'eagle-comment-reply.appspot.com',
   messagingSenderId: '919095980567'
 }
-const firebaseApp = firebase.initializeApp(config).database()
-console.log('app', firebaseApp)
+const db = firebase.initializeApp(config).database()
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   data: {
     selectedPage: '',
-    selectedPageToken: '',
+    currentPage: {},
     keywordsSeparatedByComma: '',
     commentReplyText: '',
     user: {},
@@ -50,11 +50,14 @@ new Vue({
     sendInboxMessage: true,
     postUrl: '',
     postId: '',
-    commentList: []
+    commentList: [],
+    commentProgress: 0,
+    testeList: []
+
   },
 
   firebase: {
-
+    pages: db.ref('pages')
   },
 
   localStorage: {
@@ -66,12 +69,21 @@ new Vue({
       let containKeyword = (comment) => this.keywordRegex.test(comment.message)
       return this.commentList.filter(containKeyword)
     },
+
     keywordRegex () {
       let keywordsNormalized = this.keywordsSeparatedByComma.replace(/\s/g, '').toLowerCase().replace(/,/g, '|')
       return new RegExp(keywordsNormalized)
     },
     commentsToReplyNumber () {
       return this.commentListWithKeyword.length()
+    },
+
+    unregisteredCommentsList () {
+      return this.commentList.filter((obj) => {
+        return !this.testeList.some((obj2) => {
+          return obj.id === obj2['.value']
+        })
+      })
     }
   },
 
@@ -139,7 +151,7 @@ new Vue({
       let pageId = urlSplited[0]
       let postId = isNumeric(urlSplited[_len - 1]) ? urlSplited[_len - 1] : urlSplited[_len - 2]
       let selectedPage = this.pageList[this.selectedPage]
-      this.selectedPageToken = selectedPage.access_token
+      this.currentPage = selectedPage
 
       if (urlSplited[1] === 'posts' && !urlSplited[_len - 1].includes('_')) {
         postId = selectedPage.id + '_' + postId
@@ -151,6 +163,9 @@ new Vue({
       } else {
         this.postId = postId
         this.getCommentList(postId)
+        this.$bindAsArray('testeList', this.$firebaseRefs.pages.child(this.currentPage.id + '/posts/' + this.postId))
+        console.log('teste list', this.testeList)
+        console.log('unregistered', this.unregisteredCommentsList)
       }
     },
 
@@ -177,7 +192,7 @@ new Vue({
 
     replyComments () {
       let promises = []
-      let token = this.selectedPageToken
+      let token = this.currentPage.access_token
       this.commentListWithKeyword.forEach((comment) => {
         let url = 'https://graph.facebook.com/' + comment.id + '/comments'
         let message = this.commentResolved(comment)
@@ -190,7 +205,7 @@ new Vue({
         results.forEach((response, index) => {
           if (response.data.id) {
             let id = response.config.url.split('/')[3]
-            // TODO store ID in firebase;
+            this.registerComment(id)
           } else {
             console.log('erro ao responder comentário', response)
           }
@@ -198,11 +213,12 @@ new Vue({
       })
     },
 
+    registerComment (commentId) {
+      this.$firebaseRefs.pages.child(this.currentPage.id).child('posts').child(this.postId).push(commentId)
+    },
+
     debugging () {
       console.log('comentarios com palavra chave', this.commentListWithKeyword)
-      console.log('keywordList', this.keywordRegex)
-      console.log('uid', this.user.uid)
-      console.log('user', this.user)
       this.replyComments()
     }
   }
