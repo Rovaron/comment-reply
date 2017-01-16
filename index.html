@@ -44,31 +44,37 @@
 
               <md-input-container>
                 <label>ID do Post</label>
-                <md-input type="text" required v-model="postId"></md-input>
+                <md-input type="text" required v-model="postId" disabled></md-input>
               </md-input-container>
 
               <md-input-container>
                 <label>Textos a responder (separados por virgula)</label>
-                <md-input type="text" required v-model="keywordsSeparatedByComma"></md-input>
+              <md-input type="text" required v-model="keywordsSeparatedByComma" :disabled="unregisteredCommentList === ''" @blur.native="getCommentListWithKeyword()"></md-input>
               </md-input-container>
 
               <md-input-container>
                 <label class="hint">Resposta</label>
-                <md-textarea v-model="commentReplyText"></md-textarea>
+                <md-textarea v-model="commentReplyText" :disabled="unregisteredCommentList === ''"></md-textarea>
                 <span class="md-hint">use {nome} para inserir o nome da pessoa na publicação.</span>
               </md-input-container>
 
               <br>
-              <md-checkbox name="sendmessage" v-model="sendInboxMessage">Enviar mensagem privada</md-checkbox>
+              <!--
+              <md-checkbox name="sendmessage" v-model="sendInboxMessage" :disabled="unregisteredCommentList === ''">Enviar mensagem privada</md-checkbox>
               <md-input-container>
                 <label class="hint">Mensagem privada</label>
-                <md-textarea></md-textarea>
+                <md-textarea :disabled="unregisteredCommentList === ''"></md-textarea>
                 <span class="md-hint">use {nome} para inserir o nome da pessoa na mensagem.</span>
               </md-input-container>
-              <br>
+              <br> -->
+              <div>
+                <p>Total de comentários nesse post: {{commentList.length}}</p>
+                <p>Comentários já respondidos: {{registeredList.length}}</p>
+                <p>Comentários a responder: {{commentListWithKeyword.length}}</p>
+              </div>
               <md-layout md-flex style="justify-content: flex-end">
                 <br>
-                <md-button class="md-raised md-primary" @click="debugging">Responder comentários!</md-button>
+                <md-button class="md-raised md-primary" @click="debugging" :disabled="commentListWithKeyword.length <= 0">Responder comentários!</md-button>
               </md-layout>
             </md-card-content>
 

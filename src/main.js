@@ -51,9 +51,10 @@ new Vue({
     postUrl: '',
     postId: '',
     commentList: [],
+    unregisteredCommentList: '',
     commentProgress: 0,
-    testeList: []
-
+    registeredList: [],
+    commentListWithKeyword: []
   },
 
   firebase: {
@@ -65,25 +66,9 @@ new Vue({
   },
 
   computed: {
-    commentListWithKeyword () {
-      let containKeyword = (comment) => this.keywordRegex.test(comment.message)
-      return this.commentList.filter(containKeyword)
-    },
-
     keywordRegex () {
       let keywordsNormalized = this.keywordsSeparatedByComma.replace(/\s/g, '').toLowerCase().replace(/,/g, '|')
       return new RegExp(keywordsNormalized)
-    },
-    commentsToReplyNumber () {
-      return this.commentListWithKeyword.length()
-    },
-
-    unregisteredCommentsList () {
-      return this.commentList.filter((obj) => {
-        return !this.testeList.some((obj2) => {
-          return obj.id === obj2['.value']
-        })
-      })
     }
   },
 
@@ -146,7 +131,6 @@ new Vue({
       }
 
       let urlSplited = url.split('/')
-      console.log('splited', urlSplited)
       let _len = urlSplited.length
       let pageId = urlSplited[0]
       let postId = isNumeric(urlSplited[_len - 1]) ? urlSplited[_len - 1] : urlSplited[_len - 2]
@@ -162,26 +146,45 @@ new Vue({
         console.log('pagedata', selectedPage)
       } else {
         this.postId = postId
-        this.getCommentList(postId)
-        this.$bindAsArray('testeList', this.$firebaseRefs.pages.child(this.currentPage.id + '/posts/' + this.postId))
-        console.log('teste list', this.testeList)
-        console.log('unregistered', this.unregisteredCommentsList)
+        this.getCommentList(postId).then(
+          (response) => {
+            this.commentList = response.data.data
+            this.$bindAsArray('registeredList', this.$firebaseRefs.pages.child(this.currentPage.id + '/posts/' + this.postId))
+          },
+          (error) => {
+            console.log('error', error)
+          }
+        )
       }
     },
 
     getCommentList (postId) {
       let accessToken = this.$localStorage.get('token')
-      axios.get('https://graph.facebook.com/' + postId + '/comments', {
+
+      return axios.get('https://graph.facebook.com/' + postId + '/comments', {
         params: { access_token: accessToken }
-      }).then(
-        (response) => {
-          this.commentList = response.data.data
-          console.log('lista de comments', this.commentList)
-        },
-        (error) => {
-          console.log('error', error)
-        }
-      )
+      })
+    },
+
+    getCommentListWithKeyword () {
+      console.log('executou comments sem registro', this.unregisteredCommentList)
+      if (this.unregisteredCommentList.length > 0) {
+        console.log('teste')
+        let containKeyword = (comment) => this.keywordRegex.test(comment.message)
+        this.commentListWithKeyword = this.unregisteredCommentList.filter(containKeyword)
+        console.log('Lista a responder', this.commentListWithKeyword)
+      } else {
+        return false
+      }
+    },
+
+    getUnregisteredCommentsList () {
+      this.unregisteredCommentList = this.commentList.filter((obj) => {
+        return !this.registeredList.some((obj2) => {
+          return obj.id === obj2['.value']
+        })
+      })
+      console.log('comentarios nao registrados', this.unregisteredCommentList)
     },
 
     commentResolved (comment) {
@@ -220,6 +223,15 @@ new Vue({
     debugging () {
       console.log('comentarios com palavra chave', this.commentListWithKeyword)
       this.replyComments()
+    }
+  },
+
+  watch: {
+    registeredList (list) {
+      if (list.length > 0) {
+        console.log('lista comentarios registrados', list)
+        this.getUnregisteredCommentsList()
+      }
     }
   }
 })
