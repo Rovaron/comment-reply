@@ -1,3 +1,5 @@
+Aplicação que permite responder automaticamente a comentários predefinidos feitos no facebook.
+
 # comment-reply
 
 > A comment auto-replier built with vue.js
